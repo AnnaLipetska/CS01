@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace task2
     // Создайте коллекцию, в которой бы хранились наименования 12 месяцев, порядковый номер и
     // количество дней в соответствующем месяце.
 
-    public class Months
+    public class Months : IEnumerable, IEnumerator
     {
         int[] days = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
         string[] months =
@@ -28,12 +29,16 @@ namespace task2
             "December"
         };
 
+        int position = -1;
+
+        public object Current { get { return $"{position + 1}. {months[position]} \t: {days[position]} days"; } }
+
         // Реализуйте возможность выбора месяцев, как по порядковому номеру,
         // так и количеству дней в месяце, при этом результатом может быть не
         // только один месяц.
         public string this[int monthNumber]
         {
-            get { return $"{monthNumber}. {months[monthNumber - 1]} : {days[monthNumber - 1].ToString()} days";                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 }
+            get { return $"{monthNumber}. {months[monthNumber - 1]} : {days[monthNumber - 1]} days";                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 }
         }
 
         public IEnumerable<string> GetMonthsByDays(int daysNumber)
@@ -47,6 +52,28 @@ namespace task2
 
             }
         }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this;
+        }
+
+        public bool MoveNext()
+        {
+            if (position < months.Length - 1)
+            {
+                position++;
+                return true;
+            }
+
+            Reset();
+            return false;
+        }
+
+        public void Reset()
+        {
+            position = -1;
+        }
     }
     class Program
     {
@@ -57,8 +84,8 @@ namespace task2
 
             Console.WriteLine(new string('-', 30));
 
-            const int maxMonthLengh = 31;
-            var longestMonths = months.GetMonthsByDays(maxMonthLengh);
+            const int MAXLENGTH = 31;
+            var longestMonths = months.GetMonthsByDays(MAXLENGTH);
             Console.WriteLine("Самые длинные месяцы:");
             foreach (var month in longestMonths)
             {
@@ -66,6 +93,12 @@ namespace task2
             }
 
             Console.WriteLine(new string('-', 30));
+
+            Console.WriteLine("Все месяцы:");
+            foreach (var month in months)
+            {
+                Console.WriteLine(month);
+            }
 
             Console.ReadKey();
         }
